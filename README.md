@@ -28,7 +28,7 @@ flowchart LR
   DB[(Notification Logs)]
   MQ --> DB
 <img width="3840" height="1593" alt="Untitled diagram _ Mermaid Chart-2025-09-17-131958" src="https://github.com/user-attachments/assets/cbbcb41f-e891-4808-a0f7-4e369d4cc22a" />
-design link : 
+
 
 Design Highlights : 
 
