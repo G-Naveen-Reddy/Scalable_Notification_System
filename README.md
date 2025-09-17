@@ -1,12 +1,13 @@
-Scalable Notification System
+# Scalable_Multi-Channel_Notification_System_for_Payment_Alerts
 
-Languages / Tech: Java (OOP, concurrency), suggested infra: Kafka/RabbitMQ (async queue), PostgreSQL/MySQL (persistence), Optional: Redis (cache), Spring Boot (REST API)
+# Languages / Tech: 
+Java (OOP, concurrency), suggested infra: Kafka/RabbitMQ (async queue), PostgreSQL/MySQL (persistence), Optional: Redis (cache), Spring Boot (REST API)
 
-Project Summary
+# Project Summary
 
 A production-oriented, multi-channel Notification System supporting Email, SMS, and Push notifications. Implements a Producer → Queue → Consumer architecture with thread-safe operations, queue-based delivery, metrics tracking, and extensible design suitable for fintech/payment applications like Juspay.
 
-Key Impact (suitable for resume/GitHub highlight)
+# Key Impacts :
 
 1. Supports 1,000+ notifications per minute across multiple channels.
 2. Demonstrates multi-threaded, concurrent processing with thread-safe queue handling.
@@ -14,7 +15,7 @@ Key Impact (suitable for resume/GitHub highlight)
 4. Easily extensible for additional channels, retries, scheduling, or distributed deployment.
 
 
-Architecture Diagram (Mermaid)
+# Architecture Diagram (Mermaid)
 
 flowchart LR
   User[App / Service] --> Producer[Notification Producer]
@@ -30,7 +31,7 @@ flowchart LR
 <img width="3840" height="1593" alt="Untitled diagram _ Mermaid Chart-2025-09-17-131958" src="https://github.com/user-attachments/assets/cbbcb41f-e891-4808-a0f7-4e369d4cc22a" />
 
 
-Design Highlights : 
+# Design Highlights : 
 
 1. Producer → Queue → Consumer pattern: Decouples notification generation from delivery for scalability.
 2. Multi-channel workers: Email, SMS, Push handled by separate worker classes.
@@ -40,7 +41,7 @@ Design Highlights :
 6. Extensible: Add new channels, logging, scheduling, or persistent queues with minimal code changes.
 
 
-How to use / run (local demo)
+# How to use / run (local demo)
 
 1. Clone the repo.
 2. Compile and run NotificationSystemDemo.java in the src folder.
@@ -52,7 +53,7 @@ How to use / run (local demo)
      -> Retry mechanism for failed notifications
 
 
-Future Enhancements : 
+# Future Enhancements : 
 
 1. Persistent storage – save notifications in PostgreSQL/MySQL for audit and analytics.
 2. Distributed queues – integrate Kafka/RabbitMQ for high-throughput production workloads.
