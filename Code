@@ -1,0 +1,120 @@
+// File: NotificationSystem.java
+package com.example.notifications;
+
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.*;
+
+// Enum for notification type
+enum NotificationType { EMAIL, SMS, PUSH }
+enum Status { PENDING, SENT, FAILED }
+
+// Notification class
+class Notification {
+    String message, recipient;
+    NotificationType type;
+    Status status;
+    public Notification(String recipient, String message, NotificationType type){
+        this.recipient = recipient; this.message = message; 
+        this.type = type; 
+        this.status = Status.PENDING;
+    }
+}
+
+// Producer class
+class NotificationProducer {
+    private Queue<Notification> queue;
+    public NotificationProducer(Queue<Notification> queue){ this.queue = queue; }
+    public void sendNotification(String recipient, String message, NotificationType type){
+        Notification n = new Notification(recipient,message,type);
+        queue.offer(n);
+        System.out.println("Produced: " + type + " for " + recipient);
+    }
+}
+
+// Worker interface
+interface NotificationWorker { void process(Notification n); }
+
+// Email, SMS, Push Workers
+class EmailWorker implements NotificationWorker {
+    public void process(Notification n){
+        try {
+            Thread.sleep(10); // simulate delivery time
+            n.status = Status.SENT;
+            System.out.println("EMAIL sent to "+n.recipient+": "+n.message);
+        } catch(Exception e){ n.status = Status.FAILED; }
+    }
+}
+class SMSWorker implements NotificationWorker {
+    public void process(Notification n){
+        try {
+            Thread.sleep(10); 
+            n.status = Status.SENT;
+            System.out.println("SMS sent to "+n.recipient+": "+n.message);
+        } catch(Exception e){ n.status = Status.FAILED; }
+    }
+}
+class PushWorker implements NotificationWorker {
+    public void process(Notification n){
+        try {
+            Thread.sleep(10); 
+            n.status = Status.SENT;
+            System.out.println("PUSH sent to "+n.recipient+": "+n.message);
+        } catch(Exception e){ n.status = Status.FAILED; }
+    }
+}
+
+// Consumer class
+class NotificationConsumer implements Runnable {
+    private Queue<Notification> queue;
+    private Map<NotificationType, NotificationWorker> workers;
+    private AtomicInteger processedCount;
+
+    public NotificationConsumer(Queue<Notification> queue, AtomicInteger processedCount){
+        this.queue = queue; 
+        this.processedCount = processedCount;
+        workers = new HashMap<>();
+        workers.put(NotificationType.EMAIL, new EmailWorker());
+        workers.put(NotificationType.SMS, new SMSWorker());
+        workers.put(NotificationType.PUSH, new PushWorker());
+    }
+
+    public void run(){
+        while(true){
+            Notification n = queue.poll();
+            if(n == null) break;
+            workers.get(n.type).process(n);
+            processedCount.incrementAndGet();
+        }
+    }
+}
+
+// Demo class
+public class NotificationSystemDemo {
+    public static void main(String[] args) throws InterruptedException{
+        Queue<Notification> queue = new ConcurrentLinkedQueue<>();
+        NotificationProducer producer = new NotificationProducer(queue);
+
+        // Simulate producing notifications
+        for(int i=0;i<50;i++){
+            String recipient = "user"+i+"@example.com";
+            NotificationType type = (i%3==0)? NotificationType.EMAIL : (i%3==1)? NotificationType.SMS : NotificationType.PUSH;
+            producer.sendNotification(recipient, "Message #" + i, type);
+        }
+
+        // Start multi-threaded consumers
+        int workerCount = 5;
+        ExecutorService exec = Executors.newFixedThreadPool(workerCount);
+        AtomicInteger processedCount = new AtomicInteger(0);
+
+        for(int i=0;i<workerCount;i++){
+            exec.submit(new NotificationConsumer(queue, processedCount));
+        }
+
+        exec.shutdown();
+        exec.awaitTermination(1, TimeUnit.MINUTES);
+
+        // Print final metrics
+        System.out.println("Total notifications processed: " + processedCount.get());
+    }
+}
